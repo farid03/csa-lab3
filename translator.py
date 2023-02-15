@@ -3,9 +3,6 @@
 # pylint: disable=invalid-name                # сохраним традиционные наименования сигналов
 # pylint: disable=consider-using-f-string     # избыточный синтаксис
 
-"""Транслятор brainfuck в машинный код
-"""
-
 import re
 import sys
 
@@ -48,7 +45,7 @@ def tokenize(text):
     return data_tokens, text_tokens
 
 
-def allocate(tokens):
+def parse_data(tokens: list[str]):
     data = []
     labels = {}
     for token in tokens:
@@ -60,30 +57,60 @@ def allocate(tokens):
     return data, labels
 
 
-def parse(tokens):
+def get_addressing_type(arg: str):
+    if re.fullmatch('r\d{1,2}', arg):
+        return 0
+    if re.fullmatch('\[r\d{1,2}\]', arg):
+        return 1
+    if arg.isdigit():
+        return 2
+    raise SyntaxError(f"Неправильный аргумент: {arg}")
+
+
+def parse_instructions(tokens: list[str]):
     labels = {}
     code = []
-    args_count = 0
-    for token in tokens:
+
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
         if isinstance(token, tuple):
-            labels[token[0]] = len(code)
+            labels[token] = len(code)
+            i += 1
+            continue
+
+        statement = tokens[i].upper()
+        if statement in ["HALT"]:
+            code.append({"opcode": statement, "args": []})
+            i += 1
+            pass
+        elif statement in ["JMP"]:
+            code.append({"opcode": statement, "args": [tokens[i + 1]]})
+            i += 2
+            pass
+        elif statement in ["IN", "OUT"]:
+            code.append({"opcode": statement, "args": [tokens[i + 1], tokens[i + 2]]})
+            i += 3
+            pass
+        elif statement in ["SW", "LW"]:
+            addr_type = get_addressing_type(tokens[i + 2])
+            code.append({"opcode": statement, "addr_type": addr_type, "args": [tokens[i + 1], tokens[i + 2]]})
+            i += 3
+            pass
+        elif statement in ["JMP", "BEQ", "BNE", "BLT", "BGT", "BNL", "BNG"]:
+            code.append({"opcode": statement, "args": [tokens[i + 1], tokens[i + 2], tokens[i + 3]]})
+            i += 4
+            pass
+        elif statement in ["ADD", "SUB", "MUL", "DIV", "REM"]:
+            addr_type = get_addressing_type(tokens[i + 2])
+            code.append(
+                {"opcode": statement, "addr_type": addr_type, "args": [tokens[i + 1], tokens[i + 2], tokens[i + 3]]})
+            i += 4
+            pass
         else:
-            token_upper = token.upper()
-            if args_count > 0:
-                if args_count != 0 and token[0] == 'x' and token[1:].isdigit():
-                    token = token[1:]
-                code[-1]["args"].append(token)
-                args_count -= 1
-            else:
-                code.append({"opcode": token_upper, "args": []})
-                if token_upper == 'HALT':
-                    args_count = 0
-                elif token_upper in ["IN", "OUT", "JMP"]:
-                    args_count = 1
-                elif token_upper in ["SW", "LW"]:
-                    args_count = 2
-                else:
-                    args_count = 3
+            # i += 1
+            raise SyntaxError(f"Неизвестная инструкция: {statement}")
+# TODO добавить бинарное представление (написать методы преобразования в бинарный вид имеющихся функций)
     return code, labels
 
 
@@ -91,8 +118,8 @@ def translate(text):
     text = pre_process(text)
     # data_tokens - переменные, text_tokens - инструкции
     data_tokens, text_tokens = tokenize(text)
-    data, data_labels = allocate(data_tokens)
-    code, code_labels = parse(text_tokens)
+    data, data_labels = parse_data(data_tokens)
+    code, code_labels = parse_instructions(text_tokens)
 
     program = code
     for word_idx, word in enumerate(program):
