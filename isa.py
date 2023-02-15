@@ -29,7 +29,7 @@ class Opcode(str, Enum):
     BNL = "BNL"  # Branch if Not Less than (A >= B)
     BNG = "BNG"  # Branch if less or equals then (A <= B)
 
-    IN = "IN"    # Инструкции для обеспечения  IO по порту (в качестве аргумента принимается только номер порта)
+    IN = "IN"  # Инструкции для обеспечения  IO по порту (в качестве аргумента принимается только номер порта)
     OUT = "OUT"
 
     ADD = 'ADD'  # t,a,b
@@ -66,6 +66,15 @@ ops_gr = {
         Opcode.IN,
         Opcode.OUT,
     }
+}
+
+registerToNumber = {
+    "r0":  0x0,
+    "r1":  0x1,
+    "r2":  0x2,
+    "r3":  0x3,
+    "r4":  0x4,
+    "r5":  0x5,
 }
 
 STDIN_PORT, STDOUT_PORT = 0, 1
