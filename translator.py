@@ -62,9 +62,8 @@ def get_addressing_type(arg: str):
         return 0
     if re.fullmatch('\[r\d{1,2}\]', arg):
         return 1
-    if arg.isdigit():
-        return 2
-    raise SyntaxError(f"Неправильный аргумент: {arg}")
+    # if arg.isdigit():
+    return 2
 
 
 def parse_instructions(tokens: list[str]):
@@ -75,7 +74,7 @@ def parse_instructions(tokens: list[str]):
     while i < len(tokens):
         token = tokens[i]
         if isinstance(token, tuple):
-            labels[token] = len(code)
+            labels[token[0]] = len(code)
             i += 1
             continue
 
@@ -94,7 +93,7 @@ def parse_instructions(tokens: list[str]):
             pass
         elif statement in ["SW", "LW"]:
             addr_type = get_addressing_type(tokens[i + 2])
-            code.append({"opcode": statement, "addr_type": addr_type, "args": [tokens[i + 1], tokens[i + 2]]})
+            code.append({"opcode": statement, "addr_type": addr_type, "args": [tokens[i + 1].strip("[]"), tokens[i + 2]]})
             i += 3
             pass
         elif statement in ["JMP", "BEQ", "BNE", "BLT", "BGT", "BNL", "BNG"]:
@@ -102,9 +101,9 @@ def parse_instructions(tokens: list[str]):
             i += 4
             pass
         elif statement in ["ADD", "SUB", "MUL", "DIV", "REM"]:
-            addr_type = get_addressing_type(tokens[i + 2])
+            addr_type = get_addressing_type(tokens[i + 3])
             code.append(
-                {"opcode": statement, "addr_type": addr_type, "args": [tokens[i + 1], tokens[i + 2], tokens[i + 3]]})
+                {"opcode": statement, "addr_type": addr_type, "args": [tokens[i + 1], tokens[i + 2].strip("[]"), tokens[i + 3]]})
             i += 4
             pass
         else:
@@ -114,22 +113,28 @@ def parse_instructions(tokens: list[str]):
     return code, labels
 
 
-def translate(text):
+def translate_to_struct(text):
     text = pre_process(text)
     # data_tokens - переменные, text_tokens - инструкции
     data_tokens, text_tokens = tokenize(text)
     data, data_labels = parse_data(data_tokens)
     code, code_labels = parse_instructions(text_tokens)
 
+    # резолвим метки и поля
     program = code
     for word_idx, word in enumerate(program):
         if isinstance(word, dict):
             for arg_idx, arg in enumerate(word["args"]):
                 if arg in data_labels:
-                    program[word_idx]["args"][arg_idx] = data_labels[arg]
+                    program[word_idx]["args"][arg_idx] = data_labels[arg] + len(code) * 4
                 elif arg in code_labels:
-                    program[word_idx]["args"][arg_idx] = code_labels[arg]
+                    program[word_idx]["args"][arg_idx] = code_labels[arg] * 4
+
     return data, program
+
+
+def translate_to_binary(data: list, program: list):
+    return
 
 
 def main(args):
@@ -141,7 +146,7 @@ def main(args):
     with open(source, "rt", encoding="utf-8") as f:
         source = f.read()
 
-    data, program = translate(source)
+    data, program = translate_to_struct(source)
 
     print("source LoC:", len(source.split()), "code instr:",
           len(program))
@@ -150,4 +155,5 @@ def main(args):
 
 
 if __name__ == '__main__':
+    print(format(0x0012, 'X'))
     main(sys.argv[1:])
