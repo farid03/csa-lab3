@@ -77,17 +77,46 @@ registerToNumber = {
     "r5":  0x5,
 }
 
+addrInstructionCode = {
+    Opcode.ADD: 0x2,
+    Opcode.SUB: 0x3,
+    Opcode.MUL: 0x4,
+    Opcode.DIV: 0x5,
+    Opcode.REM: 0x6,
+    Opcode.LW: 0x7,
+    Opcode.SW: 0x8
+}
+
+branchInstructionCode = {
+    Opcode.JMP: 0x0,
+    Opcode.BEQ: 0x1,
+    Opcode.BNE: 0x2,
+    Opcode.BLT: 0x3,
+    Opcode.BNL: 0x4,
+    Opcode.BGT: 0x5,
+    Opcode.BNG: 0x6,
+}
+
+ioInstructionCode = {
+    Opcode.IN: 0x0,
+    Opcode.OUT: 0x1,
+}
+
 STDIN_PORT, STDOUT_PORT = 0, 1
 
 
-def write_code(filename: str, data: list, program: list):
+def write_code(filename: str, hex_data: list, hex_program: list):
     """Записать машинный код в файл."""
-    with open(filename, "w", encoding="utf-8") as file:
-        file.write(json.dumps({"data": data, "code": program}, indent=4))
+    file = open(filename, "wb")
+    for instr in hex_program:  # записываем инструкции
+        file.write(int(instr, 16).to_bytes(4, byteorder="big"))
+
+    for i in hex_data:  # записываем данные
+        file.write(int(i, 16).to_bytes(1, byteorder="big"))
 
 
-def read_code(filename: str) -> Tuple[list, list[dict]]:
+def read_code(filename: str) -> bytes:
     """Прочесть машинный код из файла."""
-    with open(filename, encoding="utf-8") as file:
-        content = json.loads(file.read())
-        return content["data"], content["code"]
+    file = open(filename, "rb")
+
+    return file.read()
