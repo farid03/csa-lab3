@@ -8,7 +8,7 @@ import sys
 
 from typing import Tuple
 from isa import write_code, STDIN_PORT, STDOUT_PORT, \
-    ops_gr, addrInstructionCode, branchInstructionCode, ioInstructionCode, registerToNumber, Opcode
+    ops_gr, addr_instruction_code, branch_instruction_code, io_instruction_code, register_to_number, Opcode
 
 
 def pre_process(raw: str) -> str:
@@ -158,27 +158,27 @@ def translate_instruction_to_hex_str(instr: dict) -> str:
     if opcode in ops_gr["arith"]:  # addr instruction
         _instr_type = "arith"
         hex_instr = "{0}{1}{2}{3}".format(
-            get_lower_nibble(addrInstructionCode[opcode]),
+            get_lower_nibble(addr_instruction_code[opcode]),
             get_lower_nibble(int(instr["addr_type"])),
-            get_lower_nibble(registerToNumber[instr["args"][0]]),
-            get_lower_nibble(registerToNumber[instr["args"][1]]))
+            get_lower_nibble(register_to_number[instr["args"][0]]),
+            get_lower_nibble(register_to_number[instr["args"][1]]))
         if int(instr["addr_type"]) == 2:
             hex_instr += to_bytes_str(int(instr["args"][2]), 4)
         else:
-            hex_instr += get_lower_nibble(registerToNumber[instr["args"][2]])
+            hex_instr += get_lower_nibble(register_to_number[instr["args"][2]])
             hex_instr += "0" * 3
 
     elif opcode in ops_gr["mem"]:  # addr instruction
         _instr_type = "mem"
         hex_instr = "{0}{1}{2}".format(
-            get_lower_nibble(addrInstructionCode[opcode]),
+            get_lower_nibble(addr_instruction_code[opcode]),
             get_lower_nibble(int(instr["addr_type"])),
-            get_lower_nibble(registerToNumber[instr["args"][0]]))
+            get_lower_nibble(register_to_number[instr["args"][0]]))
         if int(instr["addr_type"]) == 2:
             hex_instr += "0" \
                          + to_bytes_str(instr["args"][1], 4)
         else:
-            hex_instr += get_lower_nibble(registerToNumber[instr["args"][1]]) \
+            hex_instr += get_lower_nibble(register_to_number[instr["args"][1]]) \
                          + "0" * 4
 
     elif opcode is Opcode.HALT:
@@ -189,21 +189,21 @@ def translate_instruction_to_hex_str(instr: dict) -> str:
         _instr_type = "branch"
         hex_instr = "{0}{1}".format(
             get_lower_nibble(int("1111", 2)),
-            get_lower_nibble(branchInstructionCode[opcode]))
+            get_lower_nibble(branch_instruction_code[opcode]))
         if opcode is Opcode.JMP:
             hex_instr += "00{0}".format(to_bytes_str(int(instr["args"][0]), 4))
         else:
             hex_instr += "{0}{1}{2}".format(
-                get_lower_nibble(registerToNumber[instr["args"][0]]),
-                get_lower_nibble(registerToNumber[instr["args"][1]]),
+                get_lower_nibble(register_to_number[instr["args"][0]]),
+                get_lower_nibble(register_to_number[instr["args"][1]]),
                 to_bytes_str(int(instr["args"][2]), 4))
 
     elif opcode in ops_gr["io"]:
         _instr_type = "io"
         hex_instr = "{0}{1}{2}0{3}".format(
             get_lower_nibble(int("0001", 2)),
-            get_lower_nibble(ioInstructionCode[opcode]),
-            get_lower_nibble(registerToNumber[instr["args"][0]]),
+            get_lower_nibble(io_instruction_code[opcode]),
+            get_lower_nibble(register_to_number[instr["args"][0]]),
             to_bytes_str(int(instr["args"][1]), 4))
 
     assert len(hex_instr) == 8, f"Error in translate {_instr_type}-instruction to binary: {str(instr)},\n " \

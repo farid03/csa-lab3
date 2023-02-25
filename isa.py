@@ -7,16 +7,13 @@
 """
 isa
 """
-import json
 from enum import Enum
-from typing import Tuple
 
 
 class Opcode(str, Enum):
     """
     Opcode
     """
-    # // относительная адресация
     LW = 'LW'  # A <- [B]
     SW = 'SW'  # [A] <- B
 
@@ -68,7 +65,7 @@ ops_gr = {
     }
 }
 
-registerToNumber = {
+register_to_number = {
     "r0":  0x0,
     "r1":  0x1,
     "r2":  0x2,
@@ -77,7 +74,7 @@ registerToNumber = {
     "r5":  0x5,
 }
 
-addrInstructionCode = {
+addr_instruction_code = {
     Opcode.ADD: 0x2,
     Opcode.SUB: 0x3,
     Opcode.MUL: 0x4,
@@ -87,7 +84,7 @@ addrInstructionCode = {
     Opcode.SW: 0x8
 }
 
-branchInstructionCode = {
+branch_instruction_code = {
     Opcode.JMP: 0x0,
     Opcode.BEQ: 0x1,
     Opcode.BNE: 0x2,
@@ -97,7 +94,7 @@ branchInstructionCode = {
     Opcode.BNG: 0x6,
 }
 
-ioInstructionCode = {
+io_instruction_code = {
     Opcode.IN: 0x0,
     Opcode.OUT: 0x1,
 }
