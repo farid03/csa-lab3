@@ -6,8 +6,8 @@
 import re
 import sys
 
-from typing import Tuple
-from isa import write_code, STDIN_PORT, STDOUT_PORT, \
+from typing import Tuple, List
+from isa import write_code, \
     ops_gr, addr_instruction_code, branch_instruction_code, io_instruction_code, register_to_number, Opcode
 
 
@@ -47,7 +47,7 @@ def tokenize(text) -> Tuple[list, list]:
     return data_tokens, text_tokens
 
 
-def parse_data(tokens: list[str]) -> Tuple[list, dict]:
+def parse_data(tokens: List[str]) -> Tuple[list, dict]:
     data = []
     labels = {}
     for token in tokens:
@@ -68,7 +68,7 @@ def get_addressing_type(arg: str) -> int:
     return 2
 
 
-def parse_instructions(tokens: list[str]) -> Tuple[list, dict]:
+def parse_instructions(tokens: List[str]) -> Tuple[list, dict]:
     labels = {}
     code = []
 
@@ -96,7 +96,7 @@ def parse_instructions(tokens: list[str]) -> Tuple[list, dict]:
         elif statement in ["SW", "LW"]:
             addr_type = get_addressing_type(tokens[i + 2])
             code.append(
-                {"opcode": statement, "addr_type": addr_type, "args": [tokens[i + 1].strip("[]"), tokens[i + 2]]})
+                {"opcode": statement, "addr_type": addr_type if addr_type != 0 else 1, "args": [tokens[i + 1].strip("[]"), tokens[i + 2]]})
             i += 3
             pass
         elif statement in ["JMP", "BEQ", "BNE", "BLT", "BGT", "BNL", "BNG"]:
@@ -111,12 +111,12 @@ def parse_instructions(tokens: list[str]) -> Tuple[list, dict]:
             i += 4
             pass
         else:
-            raise SyntaxError(f"Неизвестная инструкция: {statement}")
+            raise SyntaxError(f"Unknown instruction: {statement}")
 
     return code, labels
 
 
-def translate_to_struct(text) -> Tuple[list, list[dict]]:
+def translate_to_struct(text) -> Tuple[list, List[dict]]:
     text = pre_process(text)
     # data_tokens - переменные, text_tokens - инструкции
     data_tokens, text_tokens = tokenize(text)
@@ -136,7 +136,7 @@ def translate_to_struct(text) -> Tuple[list, list[dict]]:
     return data, program
 
 
-def translate_to_binary(data: list, program: list[dict]) -> Tuple[list[str], list[str]]:
+def translate_to_binary(data: list, program: List[dict]) -> Tuple[List[str], List[str]]:
     hex_program = list()
     for instr in program:
         hex_instr = translate_instruction_to_hex_str(instr)

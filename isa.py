@@ -9,6 +9,8 @@ isa
 """
 from enum import Enum
 
+from typing import List
+
 
 class Opcode(str, Enum):
     """
@@ -73,6 +75,7 @@ register_to_number = {
     "r4":  0x4,
     "r5":  0x5,
 }
+reversed_register_to_number = dict(zip(register_to_number.values(), register_to_number.keys()))
 
 addr_instruction_code = {
     Opcode.ADD: 0x2,
@@ -83,6 +86,7 @@ addr_instruction_code = {
     Opcode.LW: 0x7,
     Opcode.SW: 0x8
 }
+reversed_addr_instruction_code = dict(zip(addr_instruction_code.values(), addr_instruction_code.keys()))
 
 branch_instruction_code = {
     Opcode.JMP: 0x0,
@@ -93,11 +97,14 @@ branch_instruction_code = {
     Opcode.BGT: 0x5,
     Opcode.BNG: 0x6,
 }
+reversed_branch_instruction_code = dict(zip(branch_instruction_code.values(), branch_instruction_code.keys()))
 
 io_instruction_code = {
     Opcode.IN: 0x0,
     Opcode.OUT: 0x1,
 }
+reversed_io_instruction_code = dict(zip(io_instruction_code.values(), io_instruction_code.keys()))
+
 
 STDIN_PORT, STDOUT_PORT = 0, 1
 
@@ -112,8 +119,13 @@ def write_code(filename: str, hex_data: list, hex_program: list):
         file.write(int(i, 16).to_bytes(1, byteorder="big"))
 
 
-def read_code(filename: str) -> bytes:
+def read_code(filename: str) -> List[int]:
     """Прочесть машинный код из файла."""
     file = open(filename, "rb")
 
-    return file.read()
+    file_bytes = file.read()
+    binary = list()
+    for byte in file_bytes:
+        binary.append(byte)
+
+    return binary
