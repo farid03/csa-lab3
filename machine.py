@@ -24,9 +24,8 @@ class RegisterUnit:
     rs1: int
     rs2: int
 
-    def __init__(self, registers_count: int, stack_vertex: int) -> None:
+    def __init__(self, registers_count: int) -> None:
         self.registers = [0] * registers_count
-        self.registers[registers_count - 1] = stack_vertex
         self.rd = 0
         self.rs1 = 0
         self.rs2 = 0
@@ -128,14 +127,14 @@ class DataPath:
         assert data_memory_size > 0, "Data_memory size should be non-zero"
         self.data_memory_size = data_memory_size
         self.memory = data
-        self.current_data = data[0]
+        self.current_data = 0
         self.current_address = 0
         self.instruction_pointer = 0
         self.io = IO([ord(token) for token in input_buffer])
         self.immediately_generator = 0
         self.current_instruction = Opcode.HALT, []
         self.args: deque[str]
-        self.ru = RegisterUnit(5, stack_vertex=data_memory_size - 1)
+        self.ru = RegisterUnit(6)
         self.alu = ALU()
         self.bc = BranchComparator()
 
@@ -179,19 +178,22 @@ class DataPath:
     def latch_address_to_memory(self):
         """Загружает целевой адрес в память"""
         self.current_address = self.ru.get_rs1_data()
-        self.current_data = self.memory[self.current_address]
+        self.current_data = self.get_data_from_memory(self.current_address)
 
     def store_data_to_memory_from_reg(self):
         """Загружает данные в память"""
-        self.memory[self.ru.get_rs1_data()] = self.ru.get_rs2_data()
+        # self.memory[self.ru.get_rs1_data()] = self.ru.get_rs2_data()
+        self.set_data_to_memory(self.ru.get_rs1_data(), self.ru.get_rs2_data())
 
     def store_data_to_memory_from_imm(self):
         """Загружает данные в память"""
-        self.memory[self.ru.get_rs1_data()] = self.immediately_generator
+        # self.memory[self.ru.get_rs1_data()] = self.immediately_generator
+        self.set_data_to_memory(self.ru.get_rs1_data(), self.immediately_generator)
+
 
     def latch_address_to_memory_from_imm(self):
         self.current_address = self.immediately_generator
-        self.current_data = self.memory[self.current_address]
+        self.current_data = self.get_data_from_memory(self.current_address)
 
     def latch_reg_from_memory(self):
         """Значение из памяти перезаписывает регистр"""
@@ -210,6 +212,18 @@ class DataPath:
         self.bc.a, self.bc.b = \
             self.ru.get_rs1_data(), self.ru.get_rs2_data()
         return self.bc.compare()
+
+    def get_data_from_memory(self, address: int) -> int:
+        x = 256
+        return self.memory[address] * x ** 3 + self.memory[address + 1] * x ** 2 + \
+               self.memory[address + 2] * x + self.memory[address + 3]
+
+    def set_data_to_memory(self, address: int, value: int):
+        x = 256
+        self.memory[address] = value // (x ** 3) % x
+        self.memory[address + 1] = value // (x ** 2) % x
+        self.memory[address + 2] = value // x % x
+        self.memory[address + 3] = value % x
 
     def latch_instruct(self):
         opcode, _ = self.current_instruction
@@ -417,10 +431,10 @@ def show_memory(data_memory) -> str:
         address = len(data_memory) - address - 1
         cell_br = bin(cell)[2:]
         address_br = bin(address)[2:]
-        cell_br = (32 - len(cell_br)) * "0" + cell_br
+        cell_br = (8 - len(cell_br)) * "0" + cell_br
         address_br = (10 - len(address_br)) * "0" + address_br
         data_memory_state += f"[{{{address:5}}}\
-    [{address_br:10}]  -> [{cell_br:32}] = ({cell:10})\n"
+    [{address_br:10}]  -> [{cell_br:8}] = ({cell:10})\n"
     return data_memory_state
 
 

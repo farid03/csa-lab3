@@ -129,7 +129,7 @@ def translate_to_struct(text) -> Tuple[list, List[dict]]:
         if isinstance(word, dict):
             for arg_idx, arg in enumerate(word["args"]):
                 if arg in data_labels:
-                    program[word_idx]["args"][arg_idx] = data_labels[arg] + len(code) * 4
+                    program[word_idx]["args"][arg_idx] = data_labels[arg] * 4 + len(code) * 4
                 elif arg in code_labels:
                     program[word_idx]["args"][arg_idx] = code_labels[arg] * 4
 
@@ -145,7 +145,7 @@ def translate_to_binary(data: list, program: List[dict]) -> Tuple[List[str], Lis
 
     hex_data_bytes = list()
     for i in data:
-        hex_data_bytes.append(to_bytes_str(int(i), 2))
+        hex_data_bytes.append(to_bytes_str(int(i), 4))
 
     return hex_data_bytes, hex_program
 

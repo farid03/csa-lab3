@@ -116,7 +116,7 @@ def write_code(filename: str, hex_data: list, hex_program: list):
         file.write(int(instr, 16).to_bytes(4, byteorder="big"))
 
     for i in hex_data:  # записываем данные
-        file.write(int(i, 16).to_bytes(1, byteorder="big"))
+        file.write(int(i, 16).to_bytes(4, byteorder="big"))
 
 
 def read_code(filename: str) -> List[int]:

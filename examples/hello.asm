@@ -8,7 +8,7 @@ section text:
         lw r1,r2
         beq r1,r0,end
         out r1, 1
-        add r2,r2,1
+        add r2,r2,4
         jmp write
     end:
         halt
