@@ -134,7 +134,7 @@ class DataPath:
         self.immediately_generator = 0
         self.current_instruction = Opcode.HALT, []
         self.args: deque[str]
-        self.ru = RegisterUnit(6)
+        self.ru = RegisterUnit(5)
         self.alu = ALU()
         self.bc = BranchComparator()
 
@@ -182,14 +182,11 @@ class DataPath:
 
     def store_data_to_memory_from_reg(self):
         """Загружает данные в память"""
-        # self.memory[self.ru.get_rs1_data()] = self.ru.get_rs2_data()
         self.set_data_to_memory(self.ru.get_rs1_data(), self.ru.get_rs2_data())
 
     def store_data_to_memory_from_imm(self):
         """Загружает данные в память"""
-        # self.memory[self.ru.get_rs1_data()] = self.immediately_generator
         self.set_data_to_memory(self.ru.get_rs1_data(), self.immediately_generator)
-
 
     def latch_address_to_memory_from_imm(self):
         self.current_address = self.immediately_generator

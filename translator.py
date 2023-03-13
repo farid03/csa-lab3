@@ -136,18 +136,19 @@ def translate_to_struct(text) -> Tuple[list, List[dict]]:
     return data, program
 
 
-def translate_to_binary(data: list, program: List[dict]) -> Tuple[List[str], List[str]]:
+def translate_to_binary(data: list, program: List[dict]) -> Tuple[List[str], List[str], List[str]]:
     hex_program = list()
+    hex_program_with_mnemonics = list()
     for instr in program:
         hex_instr = translate_instruction_to_hex_str(instr)
-        print(f"{hex_instr} {instr}")
+        hex_program_with_mnemonics.append(f"{hex_instr} {instr}")
         hex_program.append(hex_instr)
 
     hex_data_bytes = list()
     for i in data:
         hex_data_bytes.append(to_bytes_str(int(i), 4))
 
-    return hex_data_bytes, hex_program
+    return hex_data_bytes, hex_program, hex_program_with_mnemonics
 
 
 def translate_instruction_to_hex_str(instr: dict) -> str:
@@ -235,7 +236,7 @@ def main(args):
         source = f.read()
 
     data, program = translate_to_struct(source)
-    hex_data, hex_program = translate_to_binary(data, program)
+    hex_data, hex_program, hex_program_with_mnemonics = translate_to_binary(data, program)
 
     print("source LoC:", len(source.split()), "code instr:",
           len(program))
