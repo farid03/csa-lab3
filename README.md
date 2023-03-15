@@ -273,7 +273,7 @@ n - count of instruct bytes
 
 1. [hello world](./examples/hello.asm) - выводит `Hello, world!` в std.
 2. [cat](./examples/cat.asm) - программа `cat`, повторяем ввод на выводе.
-3. [prob5](./examples/prob1.asm) - problem 1
+3. [prob1](./examples/prob1.asm) - problem 1
 
 Интеграционные тесты реализованы тут: [integration_test](./integration_test.py)
 
