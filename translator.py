@@ -227,10 +227,10 @@ def to_bytes_str(number: int, len_in_nibbles: int) -> str:
 
 
 def main(args):
-    assert len(args) == 2, \
-        "Wrong arguments: translator.py <input_file> <target_file>"
+    assert len(args) == 3, \
+        "Wrong arguments: translator.py <input_file> <target_binary_file> <target_mnemonic_file>"
 
-    source, target = args
+    source, target, mnemonic = args
 
     with open(source, "rt", encoding="utf-8") as f:
         source = f.read()
@@ -242,6 +242,9 @@ def main(args):
           len(program))
 
     write_code(target, hex_data, hex_program)
+
+    with open(mnemonic, "w") as f:
+        f.write('\n'.join(hex_program_with_mnemonics))
 
 
 if __name__ == '__main__':

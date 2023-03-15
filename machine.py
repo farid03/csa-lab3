@@ -440,9 +440,9 @@ def simulation(data: List[int], input_tokens, data_memory_size, limit):
 
     Длительность моделирования ограничена количеством выполненных инструкций.
     """
-    logging.info("{ INPUT MESSAGE } [ `%s` ]", "".join(input_tokens))
-    logging.info("{ INPUT TOKENS  } [ %s ]", ",".join(
-        [str(ord(token)) for token in input_tokens]))
+    # logging.info("{ INPUT MESSAGE } [ `%s` ]", "".join(input_tokens))
+    # logging.info("{ INPUT TOKENS  } [ %s ]", ",".join(
+    #     [str(ord(token)) for token in input_tokens]))
 
     data_path = DataPath(data, data_memory_size, input_tokens)
     control_unit = ControlUnit(data_path)
@@ -484,7 +484,7 @@ def main(args):
         data_memory_size=250,
         limit=12000
     )
-    logging.info("%s", f"Memory map is\n{data_memory_state}")
+    # logging.info("%s", f"Memory map is\n{data_memory_state}")
 
     print(f"Output is `{''.join(output)}`")
     print(f"instr_counter: {instr_counter} ticks: {ticks}")

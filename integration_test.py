@@ -47,9 +47,10 @@ def test_whole_by_golden(golden, caplog):
     # Создаём временную папку для тестирования приложения.
     with tempfile.TemporaryDirectory() as tmpdirname:
         # Готовим имена файлов для входных и выходных данных.
-        source = os.path.join(tmpdirname, "source.bf")
+        source = os.path.join(tmpdirname, "source.asm")
         input_stream = os.path.join(tmpdirname, "input.txt")
-        target = os.path.join(tmpdirname, "target.o")
+        target = os.path.join(tmpdirname, "target.bin")
+        mnemonics = os.path.join(tmpdirname, "mnemonics.txt")
 
         # Записываем входные данные в файлы. Данные берутся из теста.
         with open(source, "w", encoding="utf-8") as file:
@@ -60,12 +61,12 @@ def test_whole_by_golden(golden, caplog):
         # Запускаем транслятор и собираем весь стандартный вывод в переменную
         # stdout
         with contextlib.redirect_stdout(io.StringIO()) as stdout:
-            translator.main([source, target])
+            translator.main([source, target, mnemonics])
             print("============================================================")
             machine.main([target, input_stream])
 
         # Выходные данные также считываем в переменные.
-        with open(target, encoding="utf-8") as file:
+        with open(mnemonics, encoding="utf-8") as file:
             code = file.read()
 
         # Проверяем, что ожидания соответствуют реальности.

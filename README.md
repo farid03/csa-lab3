@@ -242,7 +242,7 @@ n - count of instruct bytes
 
 #### DataPath & ControlUnit
 
-![CUDP](CUDP.png)
+![CUDP](shema.drawio.png)
 
 #### ControlUnit
 
@@ -271,9 +271,9 @@ n - count of instruct bytes
 
 В качестве тестов использовано три алгоритма:
 
-1. [hello world](./programs/hello.asm) - выводит `Hello, world!` в std.
-2. [cat](./programs/cat.asm) - программа `cat`, повторяем ввод на выводе.
-3. [prob5](./programs/prob5.asm) - problem 5
+1. [hello world](./examples/hello.asm) - выводит `Hello, world!` в std.
+2. [cat](./examples/cat.asm) - программа `cat`, повторяем ввод на выводе.
+3. [prob5](./examples/prob1.asm) - problem 1
 
 Интеграционные тесты реализованы тут: [integration_test](./integration_test.py)
 
@@ -301,14 +301,3 @@ lab3:
 - `pylint` -- утилита для проверки качества кода. Некоторые правила отключены в отдельных модулях с целью упрощения кода.
 - Docker image `python-tools` включает в себя все перечисленные утилиты. Его конфигурация: [Dockerfile](./Dockerfile).
 
-Пример использования и журнал работы процессора на примере `prob5`:
-
-```bash
-
-> python3 translator.py programs/prog5.asm programs/prob5.json
-source LoC: 242 code instr: 88
-> programs/prob5.json 
-
-```
-
-[programs/prob5.json](programs/prob5.json)
